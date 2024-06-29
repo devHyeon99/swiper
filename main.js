@@ -20,6 +20,9 @@ const swiper = new Swiper(".swiper", {
     nextEl: ".next",
     prevEl: ".prev",
   },
+  mousewheel: {
+    enabled: true,
+  },
 });
 
 const swiperWrapper = document.querySelector(".swiper-wrapper");
