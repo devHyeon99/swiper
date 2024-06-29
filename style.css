@@ -6,7 +6,6 @@ body {
   row-gap: 20px;
   min-height: 100vh;
   background-color: rgba(0, 0, 0, 0.1);
-  overflow: hidden;
   font-family: "SUIT Variable", sans-serif;
 }
 
