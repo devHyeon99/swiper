@@ -14,8 +14,11 @@ img {
   user-select: none;
 }
 
-ul {
+ul,
+p,
+h2 {
   padding: 0;
+  margin: 0;
 }
 
 .container {
@@ -39,7 +42,6 @@ ul {
   overflow: hidden;
   box-shadow: 0 8px 10px rgba(0, 0, 0, 0.5),
     inset 0 2px 2px rgba(255, 255, 255, 0.2);
-  cursor: grab;
   perspective: 1000px;
 }
 
@@ -61,54 +63,77 @@ ul {
 }
 
 .content h2 {
-  font-size: 1.2rem;
+  font-size: 1rem;
+}
+.content p {
+  font-size: 0.8rem;
 }
 
-.content button {
+.player-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #ece9e6;
-  color: #000;
-  font-size: 1rem;
-  font-weight: 400;
-  outline: 0;
-  border: 0;
+  background: rgba(255, 255, 255, 0.55);
   border-radius: 5px;
   padding: 10px 16px;
-  margin-bottom: 5px;
   box-shadow: 0 0 2px #eee;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  gap: 0.25rem;
 }
 
-.content button:is(:hover, :focus-visible) {
-  transform: scale(0.97);
+.progress {
+  width: 182px;
+  height: 3.2px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.3);
 }
 
-.control {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  list-style: none;
-  gap: 14px;
-}
-
-.control li {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #ece9e6;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4),
-    inset 0 4px 4px rgba(255, 255, 255, 0.2);
-  padding: 16px;
+.pin {
+  position: absolute;
+  top: -5px;
+  left: 96.5%;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
+  background: #ece9e6;
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.5);
   cursor: pointer;
-  transform: scale(1);
 }
 
-.control li:is(:hover, :focus-visible) {
+.bar {
+  position: relative;
+  background: #fff;
+  width: 0;
+  height: 100%;
+}
+
+.time-display {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 0.25rem 0rem;
+}
+
+.player-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.play-btn,
+.prev,
+.next {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2rem;
+  width: 2rem;
+  cursor: pointer;
+  color: #212121;
+}
+
+.play-btn:is(:hover, :focus-visible),
+.prev:is(:hover, :focus-visible),
+.next:is(:hover, :focus-visible) {
   transform: scale(0.97);
 }
 

@@ -12,7 +12,7 @@ const data = [
     name: "OurMovie",
   },
   {
-    name: "QWER",
+    name: "qwer",
   },
   {
     name: "TakeCare",
