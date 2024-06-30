@@ -6,9 +6,13 @@ class AudioPlayer {
     this.#audio.src = source;
   }
 
-  play(fromTime = 0) {
-    this.#audio.currentTime = fromTime; // Set the starting point
+  play(startTime = 0) {
+    this.#audio.currentTime = startTime;
     this.#audio.play();
+  }
+
+  seek(time) {
+    this.#audio.currentTime = time;
   }
 
   loopPlay() {

@@ -23,9 +23,11 @@ const swiper = new Swiper(".swiper", {
 const swiperWrapper = document.querySelector(".swiper-wrapper");
 let currentAudioPlayer = null;
 let currentAudioName = null;
+let currentSlideIndex = null;
 let slidePlayStates = {};
 let isDragging = false;
 
+// 카드 뒤집기 함수
 const flipCard = (card, flipDuration) => {
   card.classList.add("card-flip");
   setTimeout(() => {
@@ -33,6 +35,7 @@ const flipCard = (card, flipDuration) => {
   }, flipDuration);
 };
 
+// 음악 재생 시간 설정
 const formatTime = (time) => {
   const minutes = Math.floor(time / 60);
   const seconds = Math.floor(time % 60)
@@ -41,6 +44,7 @@ const formatTime = (time) => {
   return `${minutes}:${seconds}`;
 };
 
+// 음악 재생 프로그레스바, 시간 업데이트 함수
 const updateProgressBar = (progressBar, timeDisplay) => {
   if (!currentAudioPlayer) return;
 
@@ -60,6 +64,7 @@ const updateProgressBar = (progressBar, timeDisplay) => {
   });
 };
 
+// 음악 플레이어 UI 초기화 함수
 const resetUI = (index) => {
   const slide = document.querySelector(`.swiper-slide[data-index="${index}"]`);
   if (!slide) return;
@@ -74,6 +79,40 @@ const resetUI = (index) => {
   timeDisplay.textContent = "0:00 / 0:00";
   // 버튼 초기화
   button.setAttribute("name", "play-circle-outline");
+};
+
+// 음악 싱크 조정 핸들러
+const handleSeekAudio = (event, progress, progressBar, timeDisplay) => {
+  const slide = event.target.closest(".swiper-slide");
+  const slideIndex = Number(slide.dataset.index);
+
+  // 현재 재생 중인 슬라이드와 클릭한 슬라이드가 동일한지 확인
+  if (!currentAudioPlayer || slideIndex !== currentSlideIndex) return;
+
+  const rect = progress.getBoundingClientRect();
+  const offsetX = event.clientX - rect.left;
+  const width = rect.width;
+  const seekTime = (offsetX / width) * currentAudioPlayer.duration;
+
+  currentAudioPlayer.seek(seekTime);
+  updateProgressBar(progressBar, timeDisplay);
+};
+
+// 음악 재생 끝나고 이벤트 처리 핸들러
+const handleEndAudio = (button, index) => {
+  const nextIndex = (index + 1) % data.length;
+  const newslide = document.querySelector(
+    `.swiper-slide[data-index="${nextIndex}"]`
+  );
+  const Button = newslide.querySelector(".play-btn");
+  const progressBar = newslide.querySelector(".bar");
+  const timeDisplay = newslide.querySelector(".time-display");
+
+  button.setAttribute("name", "play-circle-outline");
+  swiper.slideToLoop(nextIndex);
+
+  playAudio(Button, nextIndex);
+  updateProgressBar(progressBar, timeDisplay);
 };
 
 const playAudio = (button, index) => {
@@ -100,12 +139,19 @@ const playAudio = (button, index) => {
 
     // 새로운 AudioPlayer 인스턴스 생성 및 재생
     currentAudioPlayer = new AudioPlayer(`./assets/audio/${audioName}.mp3`);
+
+    // audio 재생이 끝났을 때 이벤트 처리
+    currentAudioPlayer.addEventListener("ended", () =>
+      handleEndAudio(button, index)
+    );
+
     currentAudioPlayer.play();
     button.setAttribute("name", "pause-circle-outline");
-    currentAudioName = audioName;
 
     // 현재 슬라이드의 재생 상태 업데이트
     slidePlayStates[index] = true;
+    currentAudioName = audioName;
+    currentSlideIndex = index;
     return;
   }
 
@@ -113,7 +159,6 @@ const playAudio = (button, index) => {
   if (currentAudioPlayer && currentAudioPlayer.isPlaying()) {
     currentAudioPlayer.pause();
     button.setAttribute("name", "play-circle-outline");
-    slidePlayStates[index] = false;
     return;
   }
 
@@ -124,19 +169,11 @@ const playAudio = (button, index) => {
     slidePlayStates[index] = true;
     return;
   }
-
-  // 새로운 AudioPlayer 인스턴스를 생성하여 재생
-  currentAudioPlayer = new AudioPlayer(`./assets/audio/${audioName}.mp3`);
-  currentAudioPlayer.play();
-  button.setAttribute("name", "pause-circle-outline");
-  currentAudioName = audioName;
-
-  // 현재 슬라이드의 재생 상태 업데이트
-  slidePlayStates[index] = true;
 };
 
 const handleClick = (event) => {
   const slide = event.target.closest(".swiper-slide");
+  const progress = slide.querySelector(".progress");
   const progressBar = slide.querySelector(".bar");
   const timeDisplay = slide.querySelector(".time-display");
   const prev = slide.querySelector(".prev");
@@ -158,20 +195,30 @@ const handleClick = (event) => {
   if (event.target === prev) {
     if (index === 0) {
       swiper.slideToLoop(data.length - 1);
+      if (currentAudioPlayer) handleEndAudio(button, data.length - 2);
+      return;
     }
     swiper.slideToLoop(index - 1);
+    if (currentAudioPlayer) handleEndAudio(button, index - 2);
   }
 
   if (event.target === next) {
     if (index === data.length - 1) {
       swiper.slideToLoop(0);
+      if (currentAudioPlayer) handleEndAudio(button, -1);
+      return;
     }
     swiper.slideToLoop(index + 1);
+    if (currentAudioPlayer) handleEndAudio(button, index);
   }
 
   if (event.target === button) {
     playAudio(button, index);
     updateProgressBar(progressBar, timeDisplay);
+  }
+
+  if (event.target === progress) {
+    handleSeekAudio(event, progress, progressBar, timeDisplay);
   }
 };
 

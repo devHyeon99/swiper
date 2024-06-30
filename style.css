@@ -105,6 +105,7 @@ h2 {
   background: #fff;
   width: 0;
   height: 100%;
+  pointer-events: none; /* 마우스 이벤트 비활성화 */
 }
 
 .time-display {
